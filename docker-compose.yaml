@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: zookeeper
+    networks:
+      - gpn
+
+  kafka:
+    image: wurstmeister/kafka
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_BROKER_ID: 1
+    networks:
+      - gpn
+
+  journal-service:
+    image: hseeberger/scala-sbt:8u222_1.3.6_2.12.10
+    working_dir: /home/sbtuser/journal-service
+    volumes:
+      - ./journal-service:/home/sbtuser/journal-service
+      - ./commons:/home/sbtuser/commons
+      - /home/ilya/.sbt:/home/sbtuser/.sbt
+      - /home/ilya/.ivy2:/home/sbtuser/.ivy2
+    networks:
+      - gpn
+    command: bash -c "groupmod -g 1000 sbtuser && usermod -u 1000 sbtuser && su sbtuser && sbt run"
+
+networks:
+  gpn:
