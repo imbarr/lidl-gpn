@@ -16,16 +16,25 @@ services:
       - gpn
 
   journal-service:
-    image: hseeberger/scala-sbt:8u222_1.3.6_2.12.10
+    build:
+      context: ./docker/sbt
+      args:
+        GID: $GID
+        UID: $UID
     working_dir: /home/sbtuser/journal-service
+    user: sbtuser
     volumes:
       - ./journal-service:/home/sbtuser/journal-service
       - ./commons:/home/sbtuser/commons
-      - /home/ilya/.sbt:/home/sbtuser/.sbt
-      - /home/ilya/.ivy2:/home/sbtuser/.ivy2
+      - $USER_HOME/.sbt:/home/sbtuser/.sbt
+      - $USER_HOME/.ivy2:/home/sbtuser/.ivy2
+      - $USER_HOME/.cache/coursier:/home/sbtuser/.cache/coursier
     networks:
       - gpn
-    command: bash -c "groupmod -g 1000 sbtuser && usermod -u 1000 sbtuser && su sbtuser && sbt run"
+    ports:
+    - 9008:9008
+    tty: true
+    command: sbt run
 
 networks:
   gpn:

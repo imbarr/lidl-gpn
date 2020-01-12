@@ -16,7 +16,7 @@ object Main extends App {
   val injector = Guice.createInjector(new AppModule)
   val routes = injector.instance[Routes]
 
-  val binding = Http().bindAndHandle(routes.root, "localhost", 9008)
+  val binding = Http().bindAndHandle(routes.root, "0.0.0.0", 9008)
 
   println("Press RETURN to stop...")
   StdIn.readLine()
