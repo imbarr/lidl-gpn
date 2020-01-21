@@ -12,10 +12,11 @@ lazy val dependencies = Seq(
   "org.apache.kafka" %% "kafka-streams-scala" % "2.4.0",
   "com.typesafe.akka" %% "akka-http"   % "10.1.11",
   "com.typesafe.akka" %% "akka-stream" % "2.5.26",
-  "com.typesafe.akka" %% "akka-stream-kafka" % "1.1.0",
+  "com.typesafe.akka" %% "akka-stream-kafka" % "2.0.0",
 
   "org.typelevel" %% "cats-effect" % "2.0.0",
   "net.codingwell" %% "scala-guice" % "4.2.6",
+  "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime,
 )
 
 lazy val kafkaCommons = ProjectRef(file("../commons"), id = "commons")

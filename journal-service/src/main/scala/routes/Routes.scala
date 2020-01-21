@@ -1,19 +1,23 @@
 package routes
 
+import akka.event.Logging
 import akka.http.scaladsl.model.ws.{TextMessage, UpgradeToWebSocket}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.directives.DebuggingDirectives
 import akka.stream.scaladsl.Sink
 import circe.akka.Marshalling._
 import io.circe.Printer
 import io.circe.generic.auto._
 import io.circe.syntax._
-import javax.inject.{Singleton, Inject}
+import javax.inject.{Inject, Singleton}
 import kafka.JournalService
 import models.Event
 
 @Singleton
 class Routes @Inject()(journalService: JournalService) {
+
+  lazy val withLogging = DebuggingDirectives.logRequestResult("REST", Logging.InfoLevel)(root)
 
   lazy val root: Route = {
     list ~
@@ -40,7 +44,7 @@ class Routes @Inject()(journalService: JournalService) {
 
   private def stream: Route = {
     path("events" / "stream") {
-      headerValueByType[UpgradeToWebSocket]() { upgrade =>
+      extractUpgradeToWebSocket { upgrade =>
         val source = journalService.stream
           .map(_.asJson.printWith(Printer.noSpaces))
           .map(TextMessage(_))

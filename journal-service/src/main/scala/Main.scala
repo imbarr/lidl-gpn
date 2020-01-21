@@ -9,14 +9,15 @@ import routes.Routes
 import scala.io.StdIn
 
 object Main extends App {
-  implicit val system = ActorSystem("journal-service")
+  val injector = Guice.createInjector(new AppModule)
+
+  implicit val system = injector.instance[ActorSystem]
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val injector = Guice.createInjector(new AppModule)
   val routes = injector.instance[Routes]
 
-  val binding = Http().bindAndHandle(routes.root, "0.0.0.0", 9008)
+  val binding = Http().bindAndHandle(routes.withLogging, "0.0.0.0", 9008)
 
   println("Press RETURN to stop...")
   StdIn.readLine()
